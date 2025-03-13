@@ -1,15 +1,17 @@
 import React, { lazy, Suspense } from 'react';
 import { Card } from 'flowbite-react';
-import { DriveConfig } from '../types/tco';
+import { DriveConfig, WorkloadParams } from '../types/tco';
 
 const ReactApexChart = lazy(() => import('react-apexcharts'));
 
 interface PerformanceTabProps {
+  workloadParams: WorkloadParams;
+  setWorkloadParams: (params: WorkloadParams) => void;
   selectedDrives: DriveConfig[];
   isDarkMode: boolean;
 }
 
-export function PerformanceTab({ selectedDrives, isDarkMode }: PerformanceTabProps) {
+export function PerformanceTab({ workloadParams, setWorkloadParams, selectedDrives, isDarkMode }: PerformanceTabProps) {
   const iopsChartOptions = {
     chart: {
       type: 'bar',

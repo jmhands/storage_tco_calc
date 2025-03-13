@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Card, Label, TextInput, Button, Select } from 'flowbite-react';
-import { HiPlus, HiTrash, HiSave } from 'react-icons/hi';
+import { useState } from 'react';
+import { Card, Label, TextInput, Button } from 'flowbite-react';
+import { HiTrash, HiSave } from 'react-icons/hi';
 import { RackAttributes } from '../types/tco';
 
 interface RackConfigurationsTabProps {
-  currentRack: RackAttributes;
-  onUpdateRack: (rack: RackAttributes) => void;
+  rackAttributes: RackAttributes;
+  setRackAttributes: (attributes: RackAttributes) => void;
 }
 
 interface SavedRackConfig extends RackAttributes {
-  name: string;
+  name?: string;
 }
 
-export function RackConfigurationsTab({ currentRack, onUpdateRack }: RackConfigurationsTabProps) {
+export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: RackConfigurationsTabProps) {
   const [savedConfigs, setSavedConfigs] = useState<SavedRackConfig[]>([]);
   const [configName, setConfigName] = useState('');
-  const [editingRack, setEditingRack] = useState<RackAttributes>(currentRack);
+  const [editingRack, setEditingRack] = useState<RackAttributes>(rackAttributes);
 
   const handleSaveConfig = () => {
     if (!configName) return;
@@ -31,7 +31,7 @@ export function RackConfigurationsTab({ currentRack, onUpdateRack }: RackConfigu
 
   const handleLoadConfig = (config: SavedRackConfig) => {
     setEditingRack(config);
-    onUpdateRack(config);
+    setRackAttributes(config);
   };
 
   const handleDeleteConfig = (index: number) => {
@@ -41,7 +41,7 @@ export function RackConfigurationsTab({ currentRack, onUpdateRack }: RackConfigu
   const handleUpdateCurrentRack = (updates: Partial<RackAttributes>) => {
     const updatedRack = { ...editingRack, ...updates };
     setEditingRack(updatedRack);
-    onUpdateRack(updatedRack);
+    setRackAttributes(updatedRack);
   };
 
   return (

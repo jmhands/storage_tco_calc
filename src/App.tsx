@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { Card, Label, TextInput, Select, Button, DarkThemeToggle, Flowbite, Tabs, Tooltip } from 'flowbite-react';
-import { HiServer, HiCube, HiLightningBolt, HiCog, HiTrash, HiPlus, HiCog as HiSettings } from 'react-icons/hi';
-import { DriveData, DriveConfig, RackAttributes, FixedCosts, WorkloadParams, TCOResults } from './types/tco';
+import { Card, Button, DarkThemeToggle, Flowbite, Tabs, Select } from 'flowbite-react';
+import { HiServer, HiTrash, HiPlus } from 'react-icons/hi';
+import { DriveData, DriveConfig, RackAttributes, FixedCosts, WorkloadParams } from './types/tco';
 import { calculateTCO } from './utils/tcoCalculator';
 import { parseDriveData } from './utils/csvParser';
 import { PerformanceTab } from './components/PerformanceTab';
@@ -361,11 +361,11 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <DataCenterCostsSection
             fixedCosts={fixedCosts}
-            onUpdate={setFixedCosts}
+            setFixedCosts={setFixedCosts}
           />
           <WorkloadParamsSection
             workloadParams={workloadParams}
-            onUpdate={setWorkloadParams}
+            setWorkloadParams={setWorkloadParams}
           />
         </div>
 
@@ -489,13 +489,15 @@ export default function App() {
             <PerformanceTab 
               selectedDrives={selectedDrives}
               isDarkMode={isDarkMode}
+              workloadParams={workloadParams}
+              setWorkloadParams={setWorkloadParams}
             />
           </Tabs.Item>
 
-          <Tabs.Item title="Rack Configurations">
+          <Tabs.Item title="Rack Configurations" icon={HiServer}>
             <RackConfigurationsTab
-              currentRack={rackAttributes}
-              onUpdateRack={setRackAttributes}
+              rackAttributes={rackAttributes}
+              setRackAttributes={setRackAttributes}
             />
           </Tabs.Item>
         </Tabs>

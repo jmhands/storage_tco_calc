@@ -1,5 +1,3 @@
-import React from 'react';
-import { Tooltip } from 'flowbite-react';
 import { DriveConfig } from '../types/tco';
 
 interface DriveDetailsProps {

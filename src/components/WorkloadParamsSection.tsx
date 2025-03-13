@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, Label, TextInput, Button, RangeSlider } from 'flowbite-react';
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import { WorkloadParams } from '../types/tco';
 
 interface WorkloadParamsSectionProps {
   workloadParams: WorkloadParams;
-  onUpdate: (params: WorkloadParams) => void;
+  setWorkloadParams: (params: WorkloadParams) => void;
 }
 
-export function WorkloadParamsSection({ workloadParams, onUpdate }: WorkloadParamsSectionProps) {
+export function WorkloadParamsSection({ workloadParams, setWorkloadParams }: WorkloadParamsSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleUpdate = (updates: Partial<WorkloadParams>) => {
-    onUpdate({ ...workloadParams, ...updates });
+    setWorkloadParams({ ...workloadParams, ...updates });
   };
 
   return (

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, Label, TextInput, Button, RangeSlider } from 'flowbite-react';
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 import { FixedCosts } from '../types/tco';
 
 interface DataCenterCostsSectionProps {
   fixedCosts: FixedCosts;
-  onUpdate: (costs: FixedCosts) => void;
+  setFixedCosts: (costs: FixedCosts) => void;
 }
 
-export function DataCenterCostsSection({ fixedCosts, onUpdate }: DataCenterCostsSectionProps) {
+export function DataCenterCostsSection({ fixedCosts, setFixedCosts }: DataCenterCostsSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleUpdate = (updates: Partial<FixedCosts>) => {
-    onUpdate({ ...fixedCosts, ...updates });
+    setFixedCosts({ ...fixedCosts, ...updates });
   };
 
   return (
