@@ -220,15 +220,6 @@ export default function App() {
     }
   };
 
-  const chartSeries = selectedDrives.map((config) => ({
-    name: config.drive.model,
-    data: config.results ? [
-      config.results.totalResults.tcoPerTBEffectivePerMonth,
-      config.results.totalResults.tcoPerTBEffectivePerMonth * 12,
-      config.results.totalResults.tcoPerTBEffectivePerMonth * 12 * fixedCosts.depreciationYears
-    ] : [0, 0, 0]
-  }));
-
   return (
     <Flowbite>
       <div className="container mx-auto p-4 dark:bg-gray-900 min-h-screen" data-mode={isDarkMode ? 'dark' : 'light'}>
