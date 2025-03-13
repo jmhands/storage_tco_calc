@@ -13,47 +13,6 @@ import { DataCenterCostsSection } from './components/DataCenterCostsSection';
 // Lazy load ApexCharts
 const ReactApexChart = lazy(() => import('react-apexcharts'));
 
-const defaultRackAttributes: RackAttributes = {
-  dataCenterCostPerRack: 1000,
-  rackCost: 2000,
-  serverCost: 10000,
-  jbodCost: 5000,
-  switchCost: 3000,
-  serverPower: 400,
-  jbodPower: 200,
-  switchPower: 150,
-  serverRU: 2,
-  jbodRU: 4,
-  switchRU: 1,
-  drivesPerServer: 24,
-  drivesPerJBOD: 60,
-  serversPerRack: 8,
-  jbodsPerRack: 4,
-  utilityServerPerRack: 1,
-  rackUnits: 42,
-  serverRackUnits: 2
-};
-
-const defaultFixedCosts: FixedCosts = {
-  powerCostPerKWh: 0.12,
-  pue: 1.0,
-  maintenancePercentage: 0.1,
-  personnelPerRack: 0.1,
-  personnelSalary: 100000,
-  depreciationYears: 5,
-  networkCostPerMonth: 0,
-  softwareLicenseCostPerMonth: 0,
-  rackspaceAndCoolingPerMonth: 0
-};
-
-const defaultWorkloadParams: WorkloadParams = {
-  replicationFactor: 3,
-  erasureCodingOverhead: 1.4,
-  utilizationTarget: 0.75,
-  dutyActivePercent: 0.5,
-  dataReductionRatio: 1.0
-};
-
 export default function App() {
   const [drives, setDrives] = useState<DriveData[]>([]);
   const [selectedDrives, setSelectedDrives] = useState<DriveConfig[]>([]);
@@ -489,8 +448,6 @@ export default function App() {
             <PerformanceTab 
               selectedDrives={selectedDrives}
               isDarkMode={isDarkMode}
-              workloadParams={workloadParams}
-              setWorkloadParams={setWorkloadParams}
             />
           </Tabs.Item>
 
