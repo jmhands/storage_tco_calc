@@ -1,8 +1,8 @@
 name = "storage-tco-calc"
 compatibility_date = "2024-03-13"
 
-[site]
-bucket = "./dist"
+[assets]
+directory = "./dist"
 
 [build]
-command = "npm run build" 
+command = "npm run build"
