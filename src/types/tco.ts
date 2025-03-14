@@ -18,21 +18,31 @@ export interface DriveData {
   afr: number;
 }
 
+export enum RackType {
+  HDD = 'HDD',
+  SSD = 'SSD'
+}
+
 export interface RackAttributes {
-  dataCenterCostPerRack: number;
+  rackType: RackType;
   rackCost: number;
   serverCost: number;
   jbodCost: number;
+  jbofCost: number;
   switchCost: number;
   serverPower: number;
   jbodPower: number;
+  jbofPower: number;
   switchPower: number;
   serverRU: number;
   jbodRU: number;
+  jbofRU: number;
   switchRU: number;
   drivesPerServer: number;
   drivesPerJBOD: number;
+  drivesPerJBOF: number;
   jbodsPerRack: number;
+  jbofsPerRack: number;
   serversPerRack: number;
   utilityServerPerRack: number;
   rackUnits: number;
@@ -43,8 +53,6 @@ export interface FixedCosts {
   powerCostPerKWh: number;
   pue: number;
   maintenancePercentage: number;
-  personnelPerRack: number;
-  personnelSalary: number;
   depreciationYears: number;
   networkCostPerMonth: number;
   softwareLicenseCostPerMonth: number;
@@ -73,12 +81,12 @@ export interface TCOResults {
     totalCapex: number;
     capexPerMonth: number;
     capacityPerRack: number;
+    rawCapacityPerRackPB: number;
   };
   opexResults: {
     powerMaxWatts: number;
     powerCost: number;
-    maintenanceCost: number;
-    personnelCost: number;
+    replacementCostPerMonth: number;
     dataCenterCosts: number;
     totalOpex: number;
   };
@@ -87,4 +95,4 @@ export interface TCOResults {
     tcoPerTBRawPerMonth: number;
     tcoPerTBEffectivePerMonth: number;
   };
-} 
+}

@@ -1,20 +1,21 @@
 import { useState, useMemo } from 'react';
 import { Card, Badge, Select } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
-import { DriveData } from '../types/tco';
+import { DriveData, RackType } from '../types/tco';
 
 interface DriveSelectorProps {
   drives: DriveData[];
   selectedDrives: DriveData[];
   onDriveSelect: (drive: DriveData) => void;
   onDriveDeselect: (drive: DriveData) => void;
+  rackType: RackType;
 }
 
-const MAX_COMPARE = 4;
+const MAX_COMPARE = 3;
 
-const isSSD = (drive: DriveData) => drive.interface === 'NVMe' || drive.interface === 'SAS';
+const isSSD = (drive: DriveData) => drive.interface.toLowerCase().includes('nvme') || drive.interface.toLowerCase().includes('ssd');
 
-export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDeselect }: DriveSelectorProps) {
+export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDeselect, rackType }: DriveSelectorProps) {
   const [driveType, setDriveType] = useState<'all' | 'SSD' | 'HDD'>('all');
 
   // Group drives by type
@@ -27,7 +28,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
   // Filter out already selected drives
   const availableDrives = useMemo(() => {
     const drivesToShow = drivesByType[driveType];
-    return drivesToShow.filter(drive => 
+    return drivesToShow.filter(drive =>
       !selectedDrives.some(selected => selected.model === drive.model)
     );
   }, [drivesByType, driveType, selectedDrives]);
@@ -57,7 +58,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
                 className="flex items-center gap-2 p-2"
               >
                 <span>
-                  {drive.model} ({drive.capacityTB}TB, ${drive.price}, {drive.powerActiveW}W)
+                  {drive.model} ({drive.capacityTB}TB, ${drive.price.toFixed(2)}, {drive.powerActiveW}W)
                 </span>
                 <HiX
                   className="h-4 w-4 cursor-pointer hover:text-red-500"
@@ -93,7 +94,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
                 disabled={selectedDrives.length >= MAX_COMPARE}
               >
                 <option value="">
-                  {selectedDrives.length >= MAX_COMPARE 
+                  {selectedDrives.length >= MAX_COMPARE
                     ? `Maximum ${MAX_COMPARE} drives selected`
                     : 'Select a drive to compare...'}
                 </option>
@@ -109,4 +110,4 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
       </Card>
     </div>
   );
-} 
+}

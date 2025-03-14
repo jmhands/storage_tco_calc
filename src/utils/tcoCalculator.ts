@@ -1,4 +1,4 @@
-import { DriveData, RackAttributes, FixedCosts, WorkloadParams, TCOResults } from '../types/tco';
+import { DriveData, RackAttributes, FixedCosts, WorkloadParams, TCOResults, RackType } from '../types/tco';
 
 export function calculateTCO(
   drive: DriveData,
@@ -6,66 +6,91 @@ export function calculateTCO(
   fixedCosts: FixedCosts,
   workloadParams: WorkloadParams
 ): TCOResults {
-  // Calculate CAPEX
-  const drivesPerRack = rackAttributes.drivesPerServer * rackAttributes.serversPerRack +
-    rackAttributes.drivesPerJBOD * rackAttributes.jbodsPerRack;
-  const drivesCost = drive.price * drivesPerRack;
-  const serversCost = rackAttributes.serverCost * rackAttributes.serversPerRack;
-  const jbodsCost = rackAttributes.jbodCost * rackAttributes.jbodsPerRack;
-  const infrastructureCost = rackAttributes.dataCenterCostPerRack + rackAttributes.rackCost +
-    rackAttributes.switchCost * rackAttributes.utilityServerPerRack;
+  // Calculate raw capacity per drive in TB
+  const rawCapacityPerDrive = drive.capacityTB;
 
-  const totalCapex = drivesCost + serversCost + jbodsCost + infrastructureCost;
+  // Calculate number of drives per rack based on rack type
+  const drivesPerRack = rackAttributes.rackType === RackType.HDD
+    ? (rackAttributes.drivesPerServer * rackAttributes.serversPerRack) +
+      (rackAttributes.drivesPerJBOD * rackAttributes.jbodsPerRack)
+    : (rackAttributes.drivesPerServer * rackAttributes.serversPerRack) +
+      (rackAttributes.drivesPerJBOF * rackAttributes.jbofsPerRack);
+
+  // Calculate raw capacity per rack in PB
+  const rawCapacityPerRackPB = (drivesPerRack * rawCapacityPerDrive) / 1024;
+
+  // Calculate effective capacity per rack in PB
+  const effectiveCapacityPerRackPB = rawCapacityPerRackPB *
+    workloadParams.utilizationTarget /
+    workloadParams.replicationFactor /
+    workloadParams.erasureCodingOverhead *
+    workloadParams.dataReductionRatio;
+
+  // Calculate infrastructure costs
+  const infrastructureCost = rackAttributes.rackType === RackType.HDD
+    ? rackAttributes.rackCost +
+      (rackAttributes.serverCost * rackAttributes.serversPerRack) +
+      (rackAttributes.jbodCost * rackAttributes.jbodsPerRack) +
+      (rackAttributes.switchCost * rackAttributes.utilityServerPerRack)
+    : rackAttributes.rackCost +
+      (rackAttributes.serverCost * rackAttributes.serversPerRack) +
+      (rackAttributes.jbofCost * rackAttributes.jbofsPerRack) +
+      (rackAttributes.switchCost * rackAttributes.utilityServerPerRack);
+
+  // Calculate total drive cost
+  const drivesCost = drive.price * drivesPerRack;
+
+  // Calculate total CapEx
+  const totalCapex = infrastructureCost + drivesCost;
   const capexPerMonth = totalCapex / (fixedCosts.depreciationYears * 12);
 
-  // Calculate OPEX
-  const drivePowerWatts = (drive.powerActiveW * workloadParams.dutyActivePercent + 
-    drive.powerIdleW * (1 - workloadParams.dutyActivePercent)) * drivesPerRack;
-  const totalPowerWatts = drivePowerWatts +
-    (rackAttributes.serverPower * rackAttributes.serversPerRack) +
-    (rackAttributes.jbodPower * rackAttributes.jbodsPerRack) +
-    (rackAttributes.switchPower * rackAttributes.utilityServerPerRack);
-  
-  const powerKWh = totalPowerWatts * 24 * 30 / 1000; // Convert to kWh per month
-  const powerCost = powerKWh * fixedCosts.powerCostPerKWh * fixedCosts.pue; // Use PUE instead of cooling multiplier
-  
-  const maintenanceCost = totalCapex * fixedCosts.maintenancePercentage / 12;
-  const personnelCost = fixedCosts.personnelSalary * fixedCosts.personnelPerRack / 12;
+  // Calculate power consumption based on rack type
+  const totalPowerWatts = rackAttributes.rackType === RackType.HDD
+    ? (rackAttributes.serverPower * rackAttributes.serversPerRack) +
+      (rackAttributes.jbodPower * rackAttributes.jbodsPerRack) +
+      (rackAttributes.switchPower * rackAttributes.utilityServerPerRack) +
+      (drive.powerActiveW * drivesPerRack * workloadParams.dutyActivePercent) +
+      (drive.powerIdleW * drivesPerRack * (1 - workloadParams.dutyActivePercent))
+    : (rackAttributes.serverPower * rackAttributes.serversPerRack) +
+      (rackAttributes.jbofPower * rackAttributes.jbofsPerRack) +
+      (rackAttributes.switchPower * rackAttributes.utilityServerPerRack) +
+      (drive.powerActiveW * drivesPerRack * workloadParams.dutyActivePercent) +
+      (drive.powerIdleW * drivesPerRack * (1 - workloadParams.dutyActivePercent));
 
-  // Add new data center costs
-  const dataCenterCosts = fixedCosts.networkCostPerMonth + 
-    fixedCosts.softwareLicenseCostPerMonth + 
+  // Calculate power cost per month
+  const powerCostPerMonth = totalPowerWatts * 24 * 30 * fixedCosts.powerCostPerKWh * fixedCosts.pue / 1000;
+
+  // Calculate drive replacement cost based on AFR
+  const failedDrivesPerYear = drivesPerRack * (drive.afr / 100);
+  const replacementCostPerMonth = (failedDrivesPerYear * 100) / 12; // $100 per drive replacement
+
+  // Calculate data center costs per month
+  const dataCenterCosts = fixedCosts.networkCostPerMonth +
+    fixedCosts.softwareLicenseCostPerMonth +
     fixedCosts.rackspaceAndCoolingPerMonth;
 
-  const totalOpex = powerCost + maintenanceCost + personnelCost + dataCenterCosts;
-
-  // Calculate capacity
-  const rawCapacityPerDrive = drive.capacityTB;
-  const capacityPerRack = rawCapacityPerDrive * drivesPerRack;
-  const effectiveCapacityPerRack = (capacityPerRack * workloadParams.dataReductionRatio) / workloadParams.replicationFactor / workloadParams.erasureCodingOverhead;
-  const usableCapacityPerRack = effectiveCapacityPerRack * workloadParams.utilizationTarget;
-  const effectiveCapacityPerRackPB = usableCapacityPerRack / 1024;
+  // Calculate total OpEx per month
+  const totalOpex = powerCostPerMonth + replacementCostPerMonth + dataCenterCosts;
 
   // Calculate TCO per TB per month
-  const totalCostPerMonth = capexPerMonth + totalOpex;
-  const tcoPerTBRawPerMonth = totalCostPerMonth / capacityPerRack;
-  const tcoPerTBEffectivePerMonth = totalCostPerMonth / usableCapacityPerRack;
+  const tcoPerTBRawPerMonth = (capexPerMonth + totalOpex) / (rawCapacityPerRackPB * 1024);
+  const tcoPerTBEffectivePerMonth = (capexPerMonth + totalOpex) / (effectiveCapacityPerRackPB * 1024);
 
   return {
     capexResults: {
       drivesCost,
-      serversCost,
-      jbodsCost,
+      serversCost: rackAttributes.serverCost * rackAttributes.serversPerRack,
+      jbodsCost: rackAttributes.rackType === RackType.HDD ? rackAttributes.jbodCost * rackAttributes.jbodsPerRack : rackAttributes.jbofCost * rackAttributes.jbofsPerRack,
       infrastructureCost,
       totalCapex,
       capexPerMonth,
-      capacityPerRack
+      capacityPerRack: drivesPerRack * rawCapacityPerDrive,
+      rawCapacityPerRackPB
     },
     opexResults: {
       powerMaxWatts: totalPowerWatts,
-      powerCost,
-      maintenanceCost,
-      personnelCost,
+      powerCost: powerCostPerMonth,
+      replacementCostPerMonth,
       dataCenterCosts,
       totalOpex
     },
@@ -75,4 +100,4 @@ export function calculateTCO(
       tcoPerTBEffectivePerMonth
     }
   };
-} 
+}
