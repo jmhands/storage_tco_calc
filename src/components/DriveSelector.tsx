@@ -27,7 +27,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
   // Filter out already selected drives
   const availableDrives = useMemo(() => {
     const drivesToShow = drivesByType[driveType];
-    return drivesToShow.filter(drive => 
+    return drivesToShow.filter(drive =>
       !selectedDrives.some(selected => selected.model === drive.model)
     );
   }, [drivesByType, driveType, selectedDrives]);
@@ -57,7 +57,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
                 className="flex items-center gap-2 p-2"
               >
                 <span>
-                  {drive.model} ({drive.capacityTB}TB, ${drive.price}, {drive.powerActiveW}W)
+                  {drive.model} ({drive.capacityTB}TB, ${drive.price.toFixed(2)}, {drive.powerActiveW}W)
                 </span>
                 <HiX
                   className="h-4 w-4 cursor-pointer hover:text-red-500"
@@ -93,7 +93,7 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
                 disabled={selectedDrives.length >= MAX_COMPARE}
               >
                 <option value="">
-                  {selectedDrives.length >= MAX_COMPARE 
+                  {selectedDrives.length >= MAX_COMPARE
                     ? `Maximum ${MAX_COMPARE} drives selected`
                     : 'Select a drive to compare...'}
                 </option>
@@ -109,4 +109,4 @@ export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDe
       </Card>
     </div>
   );
-} 
+}

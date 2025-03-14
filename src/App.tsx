@@ -36,7 +36,7 @@ const chartOptions = {
     width: 2,
     colors: ['transparent']
   },
-  colors: ['#3F83F8', '#C27803'], // blue-500, orange-600
+  colors: ['#1A56DB', '#7E3AF2'], // blue-600, violet-500
   xaxis: {
     labels: {
       style: {
