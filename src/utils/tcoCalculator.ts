@@ -44,6 +44,7 @@ export function calculateTCO(
   // Calculate capacity
   const rawCapacityPerDrive = drive.capacityTB;
   const capacityPerRack = rawCapacityPerDrive * drivesPerRack;
+  const rawCapacityPerRackPB = capacityPerRack / 1024;
   const effectiveCapacityPerRack = (capacityPerRack * workloadParams.dataReductionRatio) / workloadParams.replicationFactor / workloadParams.erasureCodingOverhead;
   const usableCapacityPerRack = effectiveCapacityPerRack * workloadParams.utilizationTarget;
   const effectiveCapacityPerRackPB = usableCapacityPerRack / 1024;
@@ -61,7 +62,8 @@ export function calculateTCO(
       infrastructureCost,
       totalCapex,
       capexPerMonth,
-      capacityPerRack
+      capacityPerRack,
+      rawCapacityPerRackPB
     },
     opexResults: {
       powerMaxWatts: totalPowerWatts,

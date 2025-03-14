@@ -8,6 +8,7 @@ import { RackConfigurationsTab } from './components/RackConfigurationsTab';
 import { WorkloadParamsSection } from './components/WorkloadParamsSection';
 import { DataCenterCostsSection } from './components/DataCenterCostsSection';
 import { DriveSelector } from './components/DriveSelector';
+import { HiDatabase, HiCurrencyDollar, HiChartBar } from 'react-icons/hi';
 
 // Lazy load ApexCharts
 const ReactApexChart = lazy(() => import('react-apexcharts'));
@@ -102,9 +103,9 @@ export default function App() {
     rackspaceAndCoolingPerMonth: 0
   });
   const [workloadParams, setWorkloadParams] = useState<WorkloadParams>({
-    replicationFactor: 3,
-    erasureCodingOverhead: 1.4,
-    utilizationTarget: 0.75,
+    replicationFactor: 1,
+    erasureCodingOverhead: 1,
+    utilizationTarget: 1,
     dutyActivePercent: 0.5,
     dataReductionRatio: 1.0
   });
@@ -203,8 +204,18 @@ export default function App() {
         <Tabs className="mt-6">
           <Tabs.Item active title="TCO Analysis">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Card className="dark:bg-gray-800">
-                <h2 className="text-xl font-semibold mb-4 dark:text-white">Monthly Cost per TB</h2>
+              <Card className="w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+                <div className="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center me-3">
+                      <HiCurrencyDollar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h5 className="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">Monthly</h5>
+                      <p className="text-sm font-normal text-gray-500 dark:text-gray-400">Cost per TB Effective</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="h-[400px]">
                   <Suspense fallback={<div className="dark:text-white">Loading chart...</div>}>
                     <ReactApexChart
@@ -244,8 +255,18 @@ export default function App() {
                 </div>
               </Card>
 
-              <Card className="dark:bg-gray-800">
-                <h2 className="text-xl font-semibold mb-4 dark:text-white">Yearly Cost per TB</h2>
+              <Card className="w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+                <div className="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center me-3">
+                      <HiCurrencyDollar className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+                    </div>
+                    <div>
+                      <h5 className="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">Yearly</h5>
+                      <p className="text-sm font-normal text-gray-500 dark:text-gray-400">Cost per TB Effective</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="h-[400px]">
                   <Suspense fallback={<div className="dark:text-white">Loading chart...</div>}>
                     <ReactApexChart
@@ -285,8 +306,18 @@ export default function App() {
                 </div>
               </Card>
 
-              <Card className="dark:bg-gray-800">
-                <h2 className="text-xl font-semibold mb-4 dark:text-white">Total Cost per TB</h2>
+              <Card className="w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+                <div className="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center me-3">
+                      <HiCurrencyDollar className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <h5 className="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">Total</h5>
+                      <p className="text-sm font-normal text-gray-500 dark:text-gray-400">Cost per TB Effective</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="h-[400px]">
                   <Suspense fallback={<div className="dark:text-white">Loading chart...</div>}>
                     <ReactApexChart
@@ -323,6 +354,60 @@ export default function App() {
                       ]}
                     />
                   </Suspense>
+                </div>
+              </Card>
+            </div>
+
+            {/* Summary Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <Card className="dark:bg-gray-800">
+                <div className="flex items-start space-x-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <HiDatabase className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Storage Capacity</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Raw / Effective</p>
+                    {selectedDrives.map(config => (
+                      <p key={config.drive.model} className="mt-1 text-gray-900 dark:text-white">
+                        {config.results.capexResults.rawCapacityPerRackPB.toFixed(2)} PB / {config.results.totalResults.effectiveCapacityPerRackPB.toFixed(2)} PBe
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="dark:bg-gray-800">
+                <div className="flex items-start space-x-4">
+                  <div className="p-2 bg-violet-100 dark:bg-violet-900 rounded-lg">
+                    <HiCurrencyDollar className="h-6 w-6 text-violet-600 dark:text-violet-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Total Cost per Rack</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">CapEx + OpEx over {fixedCosts.depreciationYears} years</p>
+                    {selectedDrives.map(config => (
+                      <p key={config.drive.model} className="mt-1 text-gray-900 dark:text-white">
+                        ${((config.results.capexResults.totalCapex + config.results.opexResults.totalOpex * 12 * fixedCosts.depreciationYears) / 1000).toFixed(2)}k
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="dark:bg-gray-800">
+                <div className="flex items-start space-x-4">
+                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                    <HiChartBar className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">TCO per TBe</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Cost / Effective TB</p>
+                    {selectedDrives.map(config => (
+                      <p key={config.drive.model} className="mt-1 text-gray-900 dark:text-white">
+                        ${config.results.totalResults.tcoPerTBEffectivePerMonth.toFixed(2)}/TBe/month
+                      </p>
+                    ))}
+                  </div>
                 </div>
               </Card>
             </div>

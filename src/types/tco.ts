@@ -71,11 +71,11 @@ export interface TCOResults {
     totalCapex: number;
     capexPerMonth: number;
     capacityPerRack: number;
+    rawCapacityPerRackPB: number;
   };
   opexResults: {
     powerMaxWatts: number;
     powerCost: number;
-    maintenanceCost: number;
     replacementCostPerMonth: number;
     dataCenterCosts: number;
     totalOpex: number;
