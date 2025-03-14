@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Card, Label, TextInput, Button } from 'flowbite-react';
+import { Card, Label, TextInput, Button, Select } from 'flowbite-react';
 import { HiTrash, HiSave } from 'react-icons/hi';
-import { RackAttributes } from '../types/tco';
+import { RackAttributes, RackType } from '../types/tco';
 
 interface RackConfigurationsTabProps {
   rackAttributes: RackAttributes;
@@ -50,6 +50,18 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
         <Card className="dark:bg-gray-800 mb-4">
           <h2 className="text-xl font-semibold mb-4 dark:text-white">Current Rack Configuration</h2>
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <Label htmlFor="rack-type">Rack Type</Label>
+              <Select
+                id="rack-type"
+                value={editingRack.rackType}
+                onChange={(e) => handleUpdateCurrentRack({ rackType: e.target.value as RackType })}
+              >
+                <option value={RackType.HDD}>HDD Rack (Server + JBOD)</option>
+                <option value={RackType.SSD}>SSD Rack (Server + JBOF)</option>
+              </Select>
+            </div>
+
             <div>
               <Label htmlFor="drives-per-server">Drives per Server</Label>
               <TextInput
@@ -59,15 +71,87 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
                 onChange={(e) => handleUpdateCurrentRack({ drivesPerServer: Number(e.target.value) })}
               />
             </div>
-            <div>
-              <Label htmlFor="drives-per-jbod">Drives per JBOD</Label>
-              <TextInput
-                id="drives-per-jbod"
-                type="number"
-                value={editingRack.drivesPerJBOD}
-                onChange={(e) => handleUpdateCurrentRack({ drivesPerJBOD: Number(e.target.value) })}
-              />
-            </div>
+
+            {editingRack.rackType === RackType.HDD ? (
+              <>
+                <div>
+                  <Label htmlFor="drives-per-jbod">Drives per JBOD</Label>
+                  <TextInput
+                    id="drives-per-jbod"
+                    type="number"
+                    value={editingRack.drivesPerJBOD}
+                    onChange={(e) => handleUpdateCurrentRack({ drivesPerJBOD: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbods-per-rack">JBODs per Rack</Label>
+                  <TextInput
+                    id="jbods-per-rack"
+                    type="number"
+                    value={editingRack.jbodsPerRack}
+                    onChange={(e) => handleUpdateCurrentRack({ jbodsPerRack: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbod-power">JBOD Power (W)</Label>
+                  <TextInput
+                    id="jbod-power"
+                    type="number"
+                    value={editingRack.jbodPower}
+                    onChange={(e) => handleUpdateCurrentRack({ jbodPower: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbod-cost">JBOD Cost ($)</Label>
+                  <TextInput
+                    id="jbod-cost"
+                    type="number"
+                    value={editingRack.jbodCost}
+                    onChange={(e) => handleUpdateCurrentRack({ jbodCost: Number(e.target.value) })}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <Label htmlFor="drives-per-jbof">Drives per JBOF</Label>
+                  <TextInput
+                    id="drives-per-jbof"
+                    type="number"
+                    value={editingRack.drivesPerJBOF}
+                    onChange={(e) => handleUpdateCurrentRack({ drivesPerJBOF: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbofs-per-rack">JBOFs per Rack</Label>
+                  <TextInput
+                    id="jbofs-per-rack"
+                    type="number"
+                    value={editingRack.jbofsPerRack}
+                    onChange={(e) => handleUpdateCurrentRack({ jbofsPerRack: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbof-power">JBOF Power (W)</Label>
+                  <TextInput
+                    id="jbof-power"
+                    type="number"
+                    value={editingRack.jbofPower}
+                    onChange={(e) => handleUpdateCurrentRack({ jbofPower: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="jbof-cost">JBOF Cost ($)</Label>
+                  <TextInput
+                    id="jbof-cost"
+                    type="number"
+                    value={editingRack.jbofCost}
+                    onChange={(e) => handleUpdateCurrentRack({ jbofCost: Number(e.target.value) })}
+                  />
+                </div>
+              </>
+            )}
+
             <div>
               <Label htmlFor="servers-per-rack">Servers per Rack</Label>
               <TextInput
@@ -75,15 +159,6 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
                 type="number"
                 value={editingRack.serversPerRack}
                 onChange={(e) => handleUpdateCurrentRack({ serversPerRack: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="jbods-per-rack">JBODs per Rack</Label>
-              <TextInput
-                id="jbods-per-rack"
-                type="number"
-                value={editingRack.jbodsPerRack}
-                onChange={(e) => handleUpdateCurrentRack({ jbodsPerRack: Number(e.target.value) })}
               />
             </div>
             <div>
@@ -96,15 +171,6 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
               />
             </div>
             <div>
-              <Label htmlFor="jbod-power">JBOD Power (W)</Label>
-              <TextInput
-                id="jbod-power"
-                type="number"
-                value={editingRack.jbodPower}
-                onChange={(e) => handleUpdateCurrentRack({ jbodPower: Number(e.target.value) })}
-              />
-            </div>
-            <div>
               <Label htmlFor="server-cost">Server Cost ($)</Label>
               <TextInput
                 id="server-cost"
@@ -114,30 +180,12 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
               />
             </div>
             <div>
-              <Label htmlFor="jbod-cost">JBOD Cost ($)</Label>
-              <TextInput
-                id="jbod-cost"
-                type="number"
-                value={editingRack.jbodCost}
-                onChange={(e) => handleUpdateCurrentRack({ jbodCost: Number(e.target.value) })}
-              />
-            </div>
-            <div>
               <Label htmlFor="rack-cost">Rack Cost ($)</Label>
               <TextInput
                 id="rack-cost"
                 type="number"
                 value={editingRack.rackCost}
                 onChange={(e) => handleUpdateCurrentRack({ rackCost: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="dc-cost-per-rack">DC Cost per Rack ($)</Label>
-              <TextInput
-                id="dc-cost-per-rack"
-                type="number"
-                value={editingRack.dataCenterCostPerRack}
-                onChange={(e) => handleUpdateCurrentRack({ dataCenterCostPerRack: Number(e.target.value) })}
               />
             </div>
           </div>
@@ -175,7 +223,11 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
                 <div className="flex-1">
                   <h3 className="font-medium dark:text-white">{config.name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {config.drivesPerServer} drives/server, {config.drivesPerJBOD} drives/JBOD
+                    {config.rackType === RackType.HDD ? (
+                      `${config.drivesPerServer} drives/server, ${config.drivesPerJBOD} drives/JBOD`
+                    ) : (
+                      `${config.drivesPerServer} drives/server, ${config.drivesPerJBOF} drives/JBOF`
+                    )}
                   </p>
                 </div>
                 <div className="flex gap-2">

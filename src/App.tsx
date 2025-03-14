@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Card, DarkThemeToggle, Flowbite, Tabs } from 'flowbite-react';
-import { DriveData, DriveConfig, RackAttributes, FixedCosts, WorkloadParams } from './types/tco';
+import { DriveData, DriveConfig, RackAttributes, FixedCosts, WorkloadParams, RackType } from './types/tco';
 import { calculateTCO } from './utils/tcoCalculator';
 import { parseDriveData } from './utils/csvParser';
 import { PerformanceTab } from './components/PerformanceTab';
@@ -72,20 +72,25 @@ export default function App() {
   const [drives, setDrives] = useState<DriveData[]>([]);
   const [selectedDrives, setSelectedDrives] = useState<DriveConfig[]>([]);
   const [rackAttributes, setRackAttributes] = useState<RackAttributes>({
-    dataCenterCostPerRack: 10000,
+    rackType: RackType.HDD,
     rackCost: 2000,
-    serverCost: 15000,
+    serverCost: 5000,
     jbodCost: 5000,
+    jbofCost: 8000,
     switchCost: 3000,
     serverPower: 800,
     jbodPower: 200,
+    jbofPower: 300,
     switchPower: 100,
     serverRU: 2,
     jbodRU: 4,
+    jbofRU: 2,
     switchRU: 1,
-    drivesPerServer: 24,
+    drivesPerServer: 0,
     drivesPerJBOD: 60,
+    drivesPerJBOF: 24,
     jbodsPerRack: 8,
+    jbofsPerRack: 10,
     serversPerRack: 4,
     utilityServerPerRack: 2,
     rackUnits: 42,
@@ -95,8 +100,6 @@ export default function App() {
     powerCostPerKWh: 0.12,
     pue: 1.0,
     maintenancePercentage: 0.1,
-    personnelPerRack: 0.1,
-    personnelSalary: 100000,
     depreciationYears: 5,
     networkCostPerMonth: 0,
     softwareLicenseCostPerMonth: 0,
@@ -161,7 +164,32 @@ export default function App() {
   }, [rackAttributes, fixedCosts, workloadParams]);
 
   const handleDriveSelect = (drive: DriveData) => {
-    const results = calculateTCO(drive, rackAttributes, fixedCosts, workloadParams);
+    // Switch rack type based on drive type
+    const isSSDDrive = drive.interface.toLowerCase().includes('nvme') || drive.interface.toLowerCase().includes('ssd');
+    const newRackType = isSSDDrive ? RackType.SSD : RackType.HDD;
+
+    // Update rack type if different
+    if (newRackType !== rackAttributes.rackType) {
+      setRackAttributes({
+        ...rackAttributes,
+        rackType: newRackType,
+        // Reset to appropriate defaults for the rack type
+        drivesPerServer: newRackType === RackType.SSD ? 24 : 0,
+        drivesPerJBOD: 60,
+        drivesPerJBOF: 24,
+        jbodsPerRack: 8,
+        jbofsPerRack: 10,
+        serverCost: newRackType === RackType.SSD ? 15000 : 5000
+      });
+    }
+
+    const results = calculateTCO(drive, {
+      ...rackAttributes,
+      rackType: newRackType,
+      drivesPerServer: newRackType === RackType.SSD ? 24 : 0,
+      serverCost: newRackType === RackType.SSD ? 15000 : 5000
+    }, fixedCosts, workloadParams);
+
     const newConfig: DriveConfig = { drive, results };
     setSelectedDrives(prev => [...prev, newConfig]);
   };
@@ -188,6 +216,7 @@ export default function App() {
           selectedDrives={selectedDrives.map(config => config.drive)}
           onDriveSelect={handleDriveSelect}
           onDriveDeselect={handleDriveDeselect}
+          rackType={rackAttributes.rackType}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">

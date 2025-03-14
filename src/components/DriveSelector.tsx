@@ -1,20 +1,21 @@
 import { useState, useMemo } from 'react';
 import { Card, Badge, Select } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
-import { DriveData } from '../types/tco';
+import { DriveData, RackType } from '../types/tco';
 
 interface DriveSelectorProps {
   drives: DriveData[];
   selectedDrives: DriveData[];
   onDriveSelect: (drive: DriveData) => void;
   onDriveDeselect: (drive: DriveData) => void;
+  rackType: RackType;
 }
 
-const MAX_COMPARE = 4;
+const MAX_COMPARE = 3;
 
-const isSSD = (drive: DriveData) => drive.interface === 'NVMe' || drive.interface === 'SAS';
+const isSSD = (drive: DriveData) => drive.interface.toLowerCase().includes('nvme') || drive.interface.toLowerCase().includes('ssd');
 
-export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDeselect }: DriveSelectorProps) {
+export function DriveSelector({ drives, selectedDrives, onDriveSelect, onDriveDeselect, rackType }: DriveSelectorProps) {
   const [driveType, setDriveType] = useState<'all' | 'SSD' | 'HDD'>('all');
 
   // Group drives by type
