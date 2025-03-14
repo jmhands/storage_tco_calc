@@ -19,12 +19,12 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
 
   const handleSaveConfig = () => {
     if (!configName) return;
-    
+
     const newConfig: SavedRackConfig = {
       ...editingRack,
       name: configName
     };
-    
+
     setSavedConfigs([...savedConfigs, newConfig]);
     setConfigName('');
   };
@@ -198,4 +198,4 @@ export function RackConfigurationsTab({ rackAttributes, setRackAttributes }: Rac
       </div>
     </div>
   );
-} 
+}

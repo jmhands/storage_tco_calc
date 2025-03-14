@@ -36,6 +36,7 @@ const chartOptions = {
     width: 2,
     colors: ['transparent']
   },
+  colors: ['#3F83F8', '#C27803'], // blue-500, orange-600
   xaxis: {
     labels: {
       style: {
@@ -227,13 +228,13 @@ export default function App() {
                       series={[
                         {
                           name: 'Monthly CapEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? config.results.capexResults.capexPerMonth / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         },
                         {
                           name: 'Monthly OpEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? config.results.opexResults.totalOpex / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         }
@@ -268,13 +269,13 @@ export default function App() {
                       series={[
                         {
                           name: 'Yearly CapEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? (config.results.capexResults.capexPerMonth * 12) / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         },
                         {
                           name: 'Yearly OpEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? (config.results.opexResults.totalOpex * 12) / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         }
@@ -309,13 +310,13 @@ export default function App() {
                       series={[
                         {
                           name: 'Total CapEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? (config.results.capexResults.capexPerMonth * 12 * fixedCosts.depreciationYears) / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         },
                         {
                           name: 'Total OpEx/TBe',
-                          data: selectedDrives.map(config => 
+                          data: selectedDrives.map(config =>
                             config.results ? (config.results.opexResults.totalOpex * 12 * fixedCosts.depreciationYears) / (config.results.totalResults.effectiveCapacityPerRackPB * 1024) : 0
                           )
                         }
@@ -326,9 +327,9 @@ export default function App() {
               </Card>
             </div>
           </Tabs.Item>
-          
+
           <Tabs.Item title="Performance & Endurance">
-            <PerformanceTab 
+            <PerformanceTab
               selectedDrives={selectedDrives}
               isDarkMode={isDarkMode}
             />
@@ -344,4 +345,4 @@ export default function App() {
       </div>
     </Flowbite>
   );
-} 
+}

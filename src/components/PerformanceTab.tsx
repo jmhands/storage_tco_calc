@@ -21,7 +21,7 @@ export function PerformanceTab({ selectedDrives, isDarkMode }: PerformanceTabPro
       mode: isDarkMode ? 'dark' : 'light',
       palette: 'palette1'
     },
-    colors: ['#1A56DB', '#7E3AF2'],
+    colors: ['#3F83F8', '#6875F5'],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -198,4 +198,4 @@ export function PerformanceTab({ selectedDrives, isDarkMode }: PerformanceTabPro
       </Card>
     </div>
   );
-} 
+}

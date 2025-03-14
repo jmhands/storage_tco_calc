@@ -19,25 +19,27 @@ export function calculateTCO(
   const capexPerMonth = totalCapex / (fixedCosts.depreciationYears * 12);
 
   // Calculate OPEX
-  const drivePowerWatts = (drive.powerActiveW * workloadParams.dutyActivePercent + 
+  const drivePowerWatts = (drive.powerActiveW * workloadParams.dutyActivePercent +
     drive.powerIdleW * (1 - workloadParams.dutyActivePercent)) * drivesPerRack;
   const totalPowerWatts = drivePowerWatts +
     (rackAttributes.serverPower * rackAttributes.serversPerRack) +
     (rackAttributes.jbodPower * rackAttributes.jbodsPerRack) +
     (rackAttributes.switchPower * rackAttributes.utilityServerPerRack);
-  
+
   const powerKWh = totalPowerWatts * 24 * 30 / 1000; // Convert to kWh per month
   const powerCost = powerKWh * fixedCosts.powerCostPerKWh * fixedCosts.pue; // Use PUE instead of cooling multiplier
-  
-  const maintenanceCost = totalCapex * fixedCosts.maintenancePercentage / 12;
-  const personnelCost = fixedCosts.personnelSalary * fixedCosts.personnelPerRack / 12;
+
+  // Calculate drive failures and replacement costs over the deployment term
+  const drivesPerYear = drivesPerRack * (drive.afr / 100); // Convert AFR percentage to decimal
+  const totalDrivesOverTerm = drivesPerYear * fixedCosts.depreciationYears;
+  const replacementCostPerMonth = (totalDrivesOverTerm * 100) / (fixedCosts.depreciationYears * 12); // $100 per drive replacement
 
   // Add new data center costs
-  const dataCenterCosts = fixedCosts.networkCostPerMonth + 
-    fixedCosts.softwareLicenseCostPerMonth + 
+  const dataCenterCosts = fixedCosts.networkCostPerMonth +
+    fixedCosts.softwareLicenseCostPerMonth +
     fixedCosts.rackspaceAndCoolingPerMonth;
 
-  const totalOpex = powerCost + maintenanceCost + personnelCost + dataCenterCosts;
+  const totalOpex = powerCost + replacementCostPerMonth + dataCenterCosts;
 
   // Calculate capacity
   const rawCapacityPerDrive = drive.capacityTB;
@@ -64,8 +66,7 @@ export function calculateTCO(
     opexResults: {
       powerMaxWatts: totalPowerWatts,
       powerCost,
-      maintenanceCost,
-      personnelCost,
+      replacementCostPerMonth,
       dataCenterCosts,
       totalOpex
     },
@@ -75,4 +76,4 @@ export function calculateTCO(
       tcoPerTBEffectivePerMonth
     }
   };
-} 
+}

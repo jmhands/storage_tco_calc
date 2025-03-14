@@ -43,8 +43,6 @@ export interface FixedCosts {
   powerCostPerKWh: number;
   pue: number;
   maintenancePercentage: number;
-  personnelPerRack: number;
-  personnelSalary: number;
   depreciationYears: number;
   networkCostPerMonth: number;
   softwareLicenseCostPerMonth: number;
@@ -78,7 +76,7 @@ export interface TCOResults {
     powerMaxWatts: number;
     powerCost: number;
     maintenanceCost: number;
-    personnelCost: number;
+    replacementCostPerMonth: number;
     dataCenterCosts: number;
     totalOpex: number;
   };
@@ -87,4 +85,4 @@ export interface TCOResults {
     tcoPerTBRawPerMonth: number;
     tcoPerTBEffectivePerMonth: number;
   };
-} 
+}
